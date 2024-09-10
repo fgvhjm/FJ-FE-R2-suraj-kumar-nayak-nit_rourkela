@@ -15,7 +15,6 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom'; 
 import ChatApp from '../chatApp';
 
-// Payment and driver details component
 function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPaymentSuccess, city, setcity }) {
   const [isRideEnded, setIsRideEnded] = useState(false); 
   const [rating, setRating] = useState(0); 
@@ -83,22 +82,9 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }} 
           fontSize={{ base: "sm", md: "md", lg: "lg" }}          
           padding={{ base: "8px", md: "12px" }}                 
-          onClick={async () => {
-            try {
-              const response = await axios.post('https://http://localhost:3000/', 
-                { email: 'test@example.com' }, 
-                {
-                  headers: { 'Content-Type': 'application/json' },
-                  withCredentials: true, 
-                }
-              );
-              if (response.status === 200) {
-                window.location.href = response.data.url;
-              }
-            } catch (error) {
-              console.error('Error processing payment:', error);
-              alert('Payment failed. Please try again.'); 
-            }
+          onClick={() => {
+            // Simulate successful payment
+            setIsPaymentSuccess(true);
           }}
         >
           Pay Now
@@ -255,4 +241,4 @@ function RideAppLayout({ city, setcity }) {
   );
 }
 
-export default RideAppLayout;
+export default RideAppLayout;// Payment and driver details component
