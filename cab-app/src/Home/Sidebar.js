@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Icon, Link, HStack, VStack, Image, useBreakpointValue } from '@chakra-ui/react';
-import { FaHome, FaUserAlt, FaCog, FaBell } from 'react-icons/fa'; // Example icons
+import { FaHome, FaUserAlt, FaCog, FaBell, FaCar } from 'react-icons/fa'; // Example icons
 
 export default function Sidebar({ image }) {
   // Determine if the layout should switch to mobile based on screen size
@@ -41,8 +41,8 @@ export default function Sidebar({ image }) {
           minH="200px" // Ensures enough height on mobile
         >
           <SidebarItem icon={FaHome} label="" />
-          <SidebarItem icon={FaBell} label="Notifications" />
-          <SidebarItem icon={FaCog} label="Settings" />
+          <SidebarItem icon={FaBell} label="" />
+          <SidebarItem icon={FaCar} label="Settings" />
           <SidebarItem icon={FaUserAlt} label="Profile" image={image} />
         </HStack>
       )}
