@@ -85,7 +85,7 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           padding={{ base: "8px", md: "12px" }}                 
           onClick={async () => {
             try {
-              const response = await axios.post('https://http://localhost:3000', 
+              const response = await axios.post('https://http://localhost:3000/payment', 
                 { email: 'test@example.com' }, 
                 {
                   headers: { 'Content-Type': 'application/json' },
