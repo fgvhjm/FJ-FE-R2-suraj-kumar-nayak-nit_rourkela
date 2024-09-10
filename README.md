@@ -105,4 +105,4 @@ Open a pull request.
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 📧 Contact
-For any inquiries or feedback, please contact us at your-email@example.com.
+For any inquiries or feedback, please contact us at surajnie123@gmail.com.
