@@ -90,13 +90,11 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           padding={{ base: "8px", md: "12px" }}                  // Responsive padding
           onClick={async () => {
             try {
-              const response = await axios.post(
-                'https://cab-r852.vercel.app/payment', // Your API endpoint data, // Request payload
+              const response = await axios.post('https://cab-r852.vercel.app/payment', 
+                { email: 'test@example.com' }, // Example payload
                 {
-                  headers: {
-                    'Content-Type': 'application/json', // Specify the content type
-                    'Origin': 'https://cab-pygy.vercel.app' // Set the Origin header
-                  }
+                  headers: { 'Content-Type': 'application/json' },
+                  withCredentials: true, // Ensure credentials are included
                 }
               );
               if (response.status === 200) {
