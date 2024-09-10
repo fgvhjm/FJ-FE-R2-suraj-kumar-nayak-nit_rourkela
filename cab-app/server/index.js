@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const stripe = require('stripe')('k_test_51PwIPg00hCoKpQ0L6tSHEmV4168uWMlSlb5HKBwT9VJdRyccoBYYvHQbFtULrs0i0SWFcIwZ7ogK6SJEMryAYJco00NMSfSDH6'); // Use Stripe secret key from .env
+const stripe = require('stripe')('sk_test_51PwIPg00hCoKpQ0L6tSHEmV4168uWMlSlb5HKBwT9VJdRyccoBYYvHQbFtULrs0i0SWFcIwZ7ogK6SJEMryAYJco00NMSfSDH6'); // Use Stripe secret key from .env
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
@@ -13,17 +13,8 @@ const server = http.createServer(app);
 
 // Set up middleware
 app.use(cors({
-  origin: (origin, callback) => {
-    console.log(`CORS origin: ${origin}`);
-    const allowedOrigins = ['https://cab-pygy.vercel.app' || 'https://cab-pygy.vercel.app'];
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
   methods: ['GET', 'POST'],
-  credentials: true, // Allow cookies to be sent with the request
 }));
 app.use(express.json());
 
@@ -56,8 +47,8 @@ app.post('/payment', async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: `https://cab-pygy.vercel.app/payment?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://cab-pygy.vercel.app/payment-cancel`,
+      success_url: `${process.env.FRONTEND_URL}/payment?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
       customer_email: req.body.email || 'demo@gmail.com', // Use provided email or fallback to default
     });
 
@@ -78,7 +69,7 @@ app.post('/payment', async (req, res) => {
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: 'https://cab-pygy.vercel.app',
+    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app',
     methods: ['GET', 'POST'],
   },
 });
