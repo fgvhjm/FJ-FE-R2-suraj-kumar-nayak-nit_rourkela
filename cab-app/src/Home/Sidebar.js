@@ -27,8 +27,8 @@ export default function Sidebar({ image }) {
         // Vertical layout for larger screens
         <VStack spacing="25px" w="100%">
           <SidebarItem icon={FaHome} label="" />
-          <SidebarItem icon={FaBell} label="Notifications" />
-          <SidebarItem icon={FaCar } label="" />
+          <SidebarItem icon={FaBell} label="" />
+          <SidebarItem icon={FaCar } label="settings" />
         </VStack>
       )}
 
