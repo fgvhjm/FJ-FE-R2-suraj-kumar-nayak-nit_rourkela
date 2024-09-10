@@ -174,7 +174,7 @@ function ParkingApp({ ride, setride }) {
               <SearchBarWithDropdown setCity={setCity2} />
             </Flex>
 
-            <Flex flex="2.5" borderRadius="20px" overflow="hidden" bgColor="#D6D6D6" h={{ base: '300px', lg: '100%' }} ml={{ lg: 6 }} mt={{ base: 4, lg: 0 }}>
+            <Flex flex="2.5" borderRadius="20px" overflow="hidden" bgColor="#D6D6D6" h={{ base: '300px', lg: '65%' }} ml={{ lg: 6 }} mt={{ base: 4, lg: 0 }}>
               <LeafletMap city1={city1} city2={city2} shape="square" style={{ height: '100%', width: '100%' }} />
             </Flex>
           </Flex>
