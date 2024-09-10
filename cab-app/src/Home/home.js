@@ -28,7 +28,7 @@ function ParkingApp({ ride, setride }) {
     { id: 3, src: "hatach.png", alt: 'Image 3', label: 'Micro', price: 30, weight: 1.0 },
     { id: 4, src: "PngItem_5047619 (3).png", alt: 'Image 4', label: 'Luxury', price: 80, weight: 1.5 },
   ];
-  
+
   const [city1, setCity1] = useState('New York');
   const [city2, setCity2] = useState('Los Angeles');
   const [selectedImage, setSelectedImage] = useState(null);
@@ -133,7 +133,7 @@ function ParkingApp({ ride, setride }) {
         overflowY={{ base: 'scroll', lg: 'unset' }}
         fontFamily="Work Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif"
         color="#D6D6D6"
-        fontSize="22px"
+        fontSize={{ base: '16px', md: '18px', lg: '22px' }} // Responsive font size
         lineHeight="1.64"
         letterSpacing="-0.7px"
         fontWeight="450"
@@ -174,7 +174,7 @@ function ParkingApp({ ride, setride }) {
               <SearchBarWithDropdown setCity={setCity2} />
             </Flex>
 
-            <Flex flex="2.5" borderRadius="20px" overflow="hidden" bgColor="#D6D6D6" h="100%" ml={{ lg: 6 }} mt={{ base: 4, lg: 0 }}>
+            <Flex flex="2.5" borderRadius="20px" overflow="hidden" bgColor="#D6D6D6" h={{ base: '300px', lg: '100%' }} ml={{ lg: 6 }} mt={{ base: 4, lg: 0 }}>
               <LeafletMap city1={city1} city2={city2} shape="square" style={{ height: '100%', width: '100%' }} />
             </Flex>
           </Flex>
@@ -220,9 +220,6 @@ function ParkingApp({ ride, setride }) {
           <Text color="#ffee32">Fare: ₹{splitPrice}</Text>
           <Button colorScheme="yellow" onClick={onOpen}>Split Fare</Button>
         </Flex>
-        {/* <Button colorScheme="yellow" size="lg" onClick={handleBookRide}>
-          Book Ride
-        </Button> */}
         <Link to={selectedImage && city1 && city2 ? "/payment" : "#"}> {/* Conditional link */}
           <Button
             colorScheme="yellow"
