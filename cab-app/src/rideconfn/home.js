@@ -8,31 +8,28 @@ import {
   Textarea,
   HStack,
 } from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons'; // For star rating
-import LeafletMap from '../map/showmap'; // Correct path to the Leaflet map component
-import Sidebar from '../Home/Sidebar'; // Correct path to the Sidebar component
+import { StarIcon } from '@chakra-ui/icons'; 
+import LeafletMap from '../map/showmap'; 
+import Sidebar from '../Home/Sidebar'; 
 import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // To access the URL
+import { useLocation } from 'react-router-dom'; 
 import ChatApp from '../chatApp';
 
 // Payment and driver details component
 function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPaymentSuccess, city, setcity }) {
-  const [isRideEnded, setIsRideEnded] = useState(false); // For handling "End Ride"
-  const [rating, setRating] = useState(0); // For storing the rating
-  const [comment, setComment] = useState(''); // For storing the comment
-  const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false); // To handle feedback submission status
+  const [isRideEnded, setIsRideEnded] = useState(false); 
+  const [rating, setRating] = useState(0); 
+  const [comment, setComment] = useState(''); 
+  const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false); 
 
-  // Handle ride end
   const handleEndRide = () => {
     setIsRideEnded(true);
   };
 
-  // Handle star click
   const handleStarClick = (star) => {
     setRating(star);
   };
 
-  // Handle feedback submission
   const handleSubmitFeedback = () => {
     const feedback = {
       driverName,
@@ -40,17 +37,15 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
       comment,
     };
 
-    // Send feedback to the backend (assuming you have an endpoint)
-  
-        setIsFeedbackSubmitted(true); // Set feedback submitted to true to show thank you message
-      
+    // Placeholder for feedback submission logic
+    setIsFeedbackSubmitted(true); 
   }
 
   // Add new ride if payment is successful
   if (isPaymentSuccess) {
     const newRide = {
-      id: 5, // Auto-increment the id
-      position: [40.7128, -74.0060], // Coordinates (array)
+      id: city.length + 1, 
+      position: [40.7128, -74.0060], 
       price: 20,
       driverName: "binahmed",
       rating: 5,
@@ -64,20 +59,20 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
     <VStack
       w="100%"
       h="100%"
-      bg="#202020" // Dark gray background
+      bg="#202020" 
       p={4}
       borderRadius="md"
       boxShadow="md"
       spacing={4}
       align="stretch"
-      color="#D6D6D6" // Light gray text color
-      overflowY="auto" // Added scroll behavior if content overflows
+      color="#D6D6D6" 
+      overflowY="auto" 
     >
       <Box>
-        <Text fontSize="xl" fontWeight="bold" color="#ffee32"> {/* Bright yellow text */}
+        <Text fontSize="xl" fontWeight="bold" color="#ffee32"> 
           Driver: {driverName}
         </Text>
-        <Text>Car: {carDetails} - {carNumber}</Text> {/* Added car number here */}
+        <Text>Car: {carDetails} - {carNumber}</Text> 
         <Text>Price: ${price}</Text>
       </Box>
 
@@ -85,16 +80,16 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
       {!isPaymentSuccess && (
         <Button
           colorScheme='yellow'
-          w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }}  // Responsive width
-          fontSize={{ base: "sm", md: "md", lg: "lg" }}          // Responsive font size
-          padding={{ base: "8px", md: "12px" }}                  // Responsive padding
+          w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }} 
+          fontSize={{ base: "sm", md: "md", lg: "lg" }}          
+          padding={{ base: "8px", md: "12px" }}                 
           onClick={async () => {
             try {
               const response = await axios.post('https://cab-r852.vercel.app/payment', 
-                { email: 'test@example.com' }, // Example payload
+                { email: 'test@example.com' }, 
                 {
                   headers: { 'Content-Type': 'application/json' },
-                  withCredentials: true, // Ensure credentials are included
+                  withCredentials: true, 
                 }
               );
               if (response.status === 200) {
@@ -102,6 +97,7 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
               }
             } catch (error) {
               console.error('Error processing payment:', error);
+              alert('Payment failed. Please try again.'); 
             }
           }}
         >
@@ -130,7 +126,7 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           <Button
             colorScheme="yellow"
             onClick={handleEndRide}
-            w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }}  // Responsive width
+            w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }}  
           >
             End Ride
           </Button>
@@ -167,7 +163,7 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           <Button
             colorScheme="yellow"
             onClick={handleSubmitFeedback}
-            w="50%"  // Make sure the button is always visible
+            w="50%"  
             alignSelf="center"
           >
             Submit Feedback
@@ -216,8 +212,8 @@ function RideAppLayout({ city, setcity }) {
       w="100vw"
       h="100vh"
       p={4}
-      bgColor="#333533" // Dark green-gray background
-      gap={4} // Add some gap between sections
+      bgColor="#333533" 
+      gap={4} 
     >
       {/* Left Side: Sidebar */}
       <Flex direction="column" flex="1" gap={4} mr={4}>
@@ -227,10 +223,9 @@ function RideAppLayout({ city, setcity }) {
       </Flex>
 
       {/* Center Section: Map, Payment & Car Details */}
-      <Flex direction="column" flex="3" gap={4} overflowY="auto"> {/* Added overflow to this column */}
+      <Flex direction="column" flex="3" gap={4} overflowY="auto"> 
         {/* Top Half: Map */}
         <Box flex="1" borderRadius="md" overflow="hidden" boxShadow="md" bg="#D6D6D6">
-          {/* Ensure LeafletMap has height and width */}
           <Box h="100%" w="100%">
             <LeafletMap city1={city1} city2={city2} shape="square" style={{ height: '100%', width: '100%' }} />
           </Box>
@@ -252,7 +247,7 @@ function RideAppLayout({ city, setcity }) {
 
       {/* Right Side: ChatApp */}
       <Flex direction="column" flex="2" gap={4}>
-        <Box flex="2" borderRadius="md" overflow="hidden" boxShadow="md"> {/* Increased flex value for more space */}
+        <Box flex="2" borderRadius="md" overflow="hidden" boxShadow="md"> 
           <ChatApp />
         </Box>
       </Flex>
