@@ -13,7 +13,7 @@ const server = http.createServer(app);
 
 // Set up middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // Ensure the frontend URL is allowed
+  origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
   methods: ['GET', 'POST'],
 }));
 app.use(express.json());

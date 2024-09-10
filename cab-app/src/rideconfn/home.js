@@ -90,7 +90,7 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           padding={{ base: "8px", md: "12px" }}                  // Responsive padding
           onClick={async () => {
             try {
-              const response = await axios.post('http://localhost:3000/payment');
+              const response = await axios.post('https://cab-pygy.vercel.app/payment');
               if (response.status === 200) {
                 window.location.href = response.data.url;
               }
