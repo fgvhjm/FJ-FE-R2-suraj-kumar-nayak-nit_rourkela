@@ -28,7 +28,7 @@ export default function Sidebar({ image }) {
         <VStack spacing="25px" w="100%">
           <SidebarItem icon={FaHome} label="" />
           <SidebarItem icon={FaBell} label="Notifications" />
-          <SidebarItem icon={FaCog} label="Settings" />
+          <SidebarItem icon={FaCar } label="" />
         </VStack>
       )}
 
