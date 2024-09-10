@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const stripe = require('stripe')('sk_test_51PwIPg00hCoKpQ0L6tSHEmV4168uWMlSlb5HKBwT9VJdRyccoBYYvHQbFtULrs0i0SWFcIwZ7ogK6SJEMryAYJco00NMSfSDH6'); // Use Stripe secret key from .env
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use Stripe secret key from .env
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
@@ -13,14 +13,21 @@ const server = http.createServer(app);
 
 // Set up middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
+  origin: (origin, callback) => {
+    console.log(`CORS origin: ${origin}`);
+    const allowedOrigins = [process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST'],
-  credentials: true, // This is important if you're sending cookies or authentication headers
+  credentials: true, // Allow cookies to be sent with the request
 }));
 app.use(express.json());
 
 // Serve static files (React build files)
-// If serving static files in Vercel, make sure the files are properly deployed
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Define basic routes
