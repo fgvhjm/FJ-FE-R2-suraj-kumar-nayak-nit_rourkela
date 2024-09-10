@@ -11,11 +11,12 @@ import {
 import { StarIcon } from '@chakra-ui/icons'; 
 import LeafletMap from '../map/showmap'; 
 import Sidebar from '../Home/Sidebar'; 
-import axios from 'axios';
 import { useLocation } from 'react-router-dom'; 
 import ChatApp from '../chatApp';
+import axios from 'axios';
 
-function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPaymentSuccess, city, setcity }) {
+// Payment and driver details component
+function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPaymentSuccess, setIsPaymentSuccess, city, setcity }) {
   const [isRideEnded, setIsRideEnded] = useState(false); 
   const [rating, setRating] = useState(0); 
   const [comment, setComment] = useState(''); 
@@ -38,21 +39,22 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
 
     // Placeholder for feedback submission logic
     setIsFeedbackSubmitted(true); 
-  }
+  };
 
   // Add new ride if payment is successful
-  if (isPaymentSuccess) {
-    const newRide = {
-      id: city.length + 1, 
-      position: [40.7128, -74.0060], 
-      price: 20,
-      driverName: "binahmed",
-      rating: 5,
-    };
+  useEffect(() => {
+    if (isPaymentSuccess) {
+      const newRide = {
+        id: city.length + 1, 
+        position: [40.7128, -74.0060], 
+        price: 20,
+        driverName: "binahmed",
+        rating: 5,
+      };
 
-    city.push(newRide);
-    setcity(city);
-  }
+      setcity([...city, newRide]);
+    }
+  }, [isPaymentSuccess, city, setcity]);
 
   return (
     <VStack
@@ -82,9 +84,14 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           w={{ base: "80%", sm: "70%", md: "50%", lg: "30%" }} 
           fontSize={{ base: "sm", md: "md", lg: "lg" }}          
           padding={{ base: "8px", md: "12px" }}                 
-          onClick={() => {
-            // Simulate successful payment
-            setIsPaymentSuccess(true);
+          onClick={async () => {
+            try {
+              // Simulate successful payment by setting the payment success state to true
+              setIsPaymentSuccess(true);
+            } catch (error) {
+              console.error('Error processing payment:', error);
+              alert('Payment failed. Please try again.'); 
+            }
           }}
         >
           Pay Now
@@ -225,6 +232,7 @@ function RideAppLayout({ city, setcity }) {
             carNumber="AB1234"
             price={50}
             isPaymentSuccess={isPaymentSuccess}
+            setIsPaymentSuccess={setIsPaymentSuccess}
             city={city}
             setcity={setcity}
           />
@@ -241,4 +249,4 @@ function RideAppLayout({ city, setcity }) {
   );
 }
 
-export default RideAppLayout;// Payment and driver details component
+export default RideAppLayout;
