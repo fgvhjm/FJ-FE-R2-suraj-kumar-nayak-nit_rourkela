@@ -69,7 +69,7 @@ app.post('/payment', async (req, res) => {
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app/payment',
+    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app',
     methods: ['GET', 'POST'],
   },
 });
