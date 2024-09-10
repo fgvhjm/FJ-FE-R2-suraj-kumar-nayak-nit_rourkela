@@ -15,10 +15,12 @@ const server = http.createServer(app);
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
   methods: ['GET', 'POST'],
+  credentials: true, // This is important if you're sending cookies or authentication headers
 }));
 app.use(express.json());
 
 // Serve static files (React build files)
+// If serving static files in Vercel, make sure the files are properly deployed
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Define basic routes
