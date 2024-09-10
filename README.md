@@ -106,4 +106,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 📧 Contact
 For any inquiries or feedback, please contact us at your-email@example.com.
-
