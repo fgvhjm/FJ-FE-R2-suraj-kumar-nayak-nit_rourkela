@@ -7,15 +7,14 @@ import {
   VStack,
   Textarea,
   HStack,
+  useBreakpointValue, // Import Chakra's responsive hook
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons'; 
 import LeafletMap from '../map/showmap'; 
 import Sidebar from '../Home/Sidebar'; 
 import { useLocation } from 'react-router-dom'; 
 import ChatApp from '../chatApp';
-import axios from 'axios';
 
-// Payment and driver details component
 function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPaymentSuccess, setIsPaymentSuccess, city, setcity }) {
   const [isRideEnded, setIsRideEnded] = useState(false); 
   const [rating, setRating] = useState(0); 
@@ -37,11 +36,9 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
       comment,
     };
 
-    // Placeholder for feedback submission logic
     setIsFeedbackSubmitted(true); 
   };
 
-  // Add new ride if payment is successful
   useEffect(() => {
     if (isPaymentSuccess) {
       const newRide = {
@@ -77,7 +74,6 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
         <Text>Price: ${price}</Text>
       </Box>
 
-      {/* Payment Button */}
       {!isPaymentSuccess && (
         <Button
           colorScheme='yellow'
@@ -86,7 +82,6 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
           padding={{ base: "8px", md: "12px" }}                 
           onClick={async () => {
             try {
-              // Simulate successful payment by setting the payment success state to true
               setIsPaymentSuccess(true);
             } catch (error) {
               console.error('Error processing payment:', error);
@@ -98,7 +93,6 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
         </Button>
       )}
 
-      {/* Success Message and End Ride Button */}
       {isPaymentSuccess && !isRideEnded && (
         <VStack spacing={4} align="stretch">
           <Box
@@ -126,7 +120,6 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
         </VStack>
       )}
 
-      {/* Rating and Comment Section */}
       {isRideEnded && !isFeedbackSubmitted && (
         <VStack spacing={4} align="stretch" h="100%" justify="space-between">
           <Text fontSize="xl" color="#ffee32">Rate Your Ride</Text>
@@ -164,7 +157,6 @@ function PaymentAndDetails({ driverName, carDetails, carNumber, price, isPayment
         </VStack>
       )}
 
-      {/* Thank You Message after Feedback Submission */}
       {isFeedbackSubmitted && (
         <Box
           w="100%"
@@ -192,39 +184,37 @@ function RideAppLayout({ city, setcity }) {
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
   useEffect(() => {
-    // Check if there is a session_id in the URL to determine if payment was successful
     const searchParams = new URLSearchParams(location.search);
     if (searchParams.get('session_id')) {
       setIsPaymentSuccess(true);
     }
   }, [location]);
 
+  const direction = useBreakpointValue({ base: 'column', md: 'row' }); 
+  const flexSide = useBreakpointValue({ base: 1, md: 3 });
+
   return (
     <Flex
-      direction="row"
+      direction={direction}
       w="100vw"
       h="100vh"
       p={4}
       bgColor="#333533" 
       gap={4} 
     >
-      {/* Left Side: Sidebar */}
-      <Flex direction="column" flex="1" gap={4} mr={4}>
+      <Flex direction="column" flex={flexSide} gap={4} mr={4}>
         <Box flex="1" borderRadius="md" overflow="hidden" boxShadow="md">
           <Sidebar />
         </Box>
       </Flex>
 
-      {/* Center Section: Map, Payment & Car Details */}
       <Flex direction="column" flex="3" gap={4} overflowY="auto"> 
-        {/* Top Half: Map */}
         <Box flex="1" borderRadius="md" overflow="hidden" boxShadow="md" bg="#D6D6D6">
           <Box h="100%" w="100%">
             <LeafletMap city1={city1} city2={city2} shape="square" style={{ height: '100%', width: '100%' }} />
           </Box>
         </Box>
 
-        {/* Bottom Half: Payment & Car Details with Success */}
         <Box flex="1" borderRadius="md" overflow="hidden" boxShadow="md">
           <PaymentAndDetails
             driverName="John Doe"
@@ -239,7 +229,6 @@ function RideAppLayout({ city, setcity }) {
         </Box>
       </Flex>
 
-      {/* Right Side: ChatApp */}
       <Flex direction="column" flex="2" gap={4}>
         <Box flex="2" borderRadius="md" overflow="hidden" boxShadow="md"> 
           <ChatApp />
