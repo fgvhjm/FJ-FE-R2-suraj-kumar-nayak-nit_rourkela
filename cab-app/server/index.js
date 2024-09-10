@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')('sk_test_51PwIPg00hCoKpQ0L6tSHEmV4168uWMlSlb5HKBwT9VJdRyccoBYYvHQbFtULrs0i0SWFcIwZ7ogK6SJEMryAYJco00NMSfSDH6'); // Use Stripe secret key from .env
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
@@ -12,53 +12,64 @@ const app = express();
 const server = http.createServer(app);
 
 // Set up middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // Ensure the frontend URL is allowed
+  methods: ['GET', 'POST'],
+}));
 app.use(express.json());
 
-// Serve static files (if you're serving the frontend from the backend)
+// Serve static files (React build files)
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Define routes
+// Define basic routes
 app.get('/', (req, res) => {
-    res.send('Hello World');
+  res.send('Hello World');
 });
 
+// Payment route
 app.post('/payment', async (req, res) => {
-    try {
-        const product = await stripe.products.create({
-            name: "Ride",
-        });
+  try {
+    console.log('Starting payment session creation...');
 
-        const price = await stripe.prices.create({
-            product: product.id,
-            unit_amount: 100 * 100, // 100 INR
+    // Hardcode product name and price in INR
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],  // Ensure card payment is accepted
+      line_items: [
+        {
+          price_data: {
             currency: 'inr',
-        });
+            product_data: {
+              name: 'Ride',  // Hardcoded product name
+            },
+            unit_amount: 100 * 100,  // Hardcoded price (100 INR in paisa)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.FRONTEND_URL}/payment?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      customer_email: req.body.email || 'demo@gmail.com', // Use provided email or fallback to default
+    });
 
-        const session = await stripe.checkout.sessions.create({
-            line_items: [
-                {
-                    price: price.id,
-                    quantity: 1,
-                }
-            ],
-            mode: 'payment',
-            success_url: `https://your-production-site.com/payment?session_id={CHECKOUT_SESSION_ID}`, // Updated to production URL
-            cancel_url: 'https://your-production-site.com/cancel', // Updated to production URL
-            customer_email: 'demo@gmail.com',
-        });
+    console.log('Payment session created successfully');
+    res.json({ url: session.url });
 
-        res.json({ url: session.url });
-    } catch (error) {
-        console.error('Error creating payment session:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+  } catch (error) {
+    console.error('Error creating payment session:', error.message);
+
+    if (error.type === 'StripeCardError') {
+      res.status(400).json({ error: 'Payment failed due to a card error' });
+    } else {
+      res.status(500).json({ error: 'Failed to create payment session' });
     }
+  }
 });
 
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001', // Use environment variable for frontend URL
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
     methods: ['GET', 'POST'],
   },
 });
@@ -68,6 +79,7 @@ io.on('connection', (socket) => {
 
   // Listen for incoming messages from clients
   socket.on('sendMessage', (message) => {
+    console.log(`Message received from ${socket.id}: ${message}`);
     // Broadcast message to all clients except the sender
     socket.broadcast.emit('message', {
       user: socket.id,
@@ -87,7 +99,7 @@ app.get('*', (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000; // Dynamic port for deployment
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
