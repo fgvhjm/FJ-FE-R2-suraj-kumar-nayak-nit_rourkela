@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use Stripe secret key from .env
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
@@ -12,75 +12,53 @@ const app = express();
 const server = http.createServer(app);
 
 // Set up middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
-  methods: ['GET', 'POST'],
-}));
-app.use(express.json()); // Enable JSON parsing for incoming requests
+app.use(cors());
+app.use(express.json());
 
-// Manually add CORS headers to every response
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app'); // Allow frontend origin
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); // Allow specific HTTP methods
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Handle preflight requests
-  }
-  next();
-});
-
-// Serve static files (React build files)
+// Serve static files (if you're serving the frontend from the backend)
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Define basic routes
+// Define routes
 app.get('/', (req, res) => {
-  res.send('Hello World');
+    res.send('Hello World');
 });
 
-// Payment route
 app.post('/payment', async (req, res) => {
-  try {
-    console.log('Starting payment session creation...');
+    try {
+        const product = await stripe.products.create({
+            name: "Ride",
+        });
 
-    // Hardcode product name and price in INR
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],  // Ensure card payment is accepted
-      line_items: [
-        {
-          price_data: {
+        const price = await stripe.prices.create({
+            product: product.id,
+            unit_amount: 100 * 100, // 100 INR
             currency: 'inr',
-            product_data: {
-              name: 'Ride',  // Hardcoded product name
-            },
-            unit_amount: 100 * 100,  // Hardcoded price (100 INR in paisa)
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/payment?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
-      customer_email: req.body.email || 'demo@gmail.com', // Use provided email or fallback to default
-    });
+        });
 
-    console.log('Payment session created successfully');
-    res.json({ url: session.url });
+        const session = await stripe.checkout.sessions.create({
+            line_items: [
+                {
+                    price: price.id,
+                    quantity: 1,
+                }
+            ],
+            mode: 'payment',
+            success_url: `https://cab-pygy.vercel.app/payment?session_id={CHECKOUT_SESSION_ID}`, // Updated to production URL
+            cancel_url: `https://cab-pygy.vercel.app/cancel`, // Updated to production URL
+            customer_email: 'demo@gmail.com',
+        });
 
-  } catch (error) {
-    console.error('Error creating payment session:', error.message);
-
-    if (error.type === 'StripeCardError') {
-      res.status(400).json({ error: 'Payment failed due to a card error' });
-    } else {
-      res.status(500).json({ error: 'Failed to create payment session' });
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error('Error creating payment session:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  }
 });
 
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Your frontend URL
+    origin: 'https://cab-pygy.vercel.app', // Updated frontend URL
     methods: ['GET', 'POST'],
   },
 });
@@ -90,7 +68,6 @@ io.on('connection', (socket) => {
 
   // Listen for incoming messages from clients
   socket.on('sendMessage', (message) => {
-    console.log(`Message received from ${socket.id}: ${message}`);
     // Broadcast message to all clients except the sender
     socket.broadcast.emit('message', {
       user: socket.id,
@@ -110,7 +87,7 @@ app.get('*', (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Dynamic port for deployment
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
