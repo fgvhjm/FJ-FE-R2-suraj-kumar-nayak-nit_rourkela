@@ -8,7 +8,7 @@ const ChatApp = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socketIo = io('https://sorover.vercel.app/');
+    const socketIo = io('https://sorover.vercel.app');
     setSocket(socketIo);
 
     // Listen for messages from the server
