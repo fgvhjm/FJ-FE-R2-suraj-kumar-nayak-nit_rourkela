@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const stripe = require('stripe')('sk_test_51PwIPg00hCoKpQ0L6tSHEmV4168uWMlSlb5HKBwT9VJdRyccoBYYvHQbFtULrs0i0SWFcIwZ7ogK6SJEMryAYJco00NMSfSDH6'); // Use Stripe secret key from .env
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use Stripe secret key from .env
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
@@ -16,7 +16,18 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Ensure the frontend URL is allowed
   methods: ['GET', 'POST'],
 }));
-app.use(express.json());
+app.use(express.json()); // Enable JSON parsing for incoming requests
+
+// Manually add CORS headers to every response
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app'); // Allow frontend origin
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); // Allow specific HTTP methods
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // Handle preflight requests
+  }
+  next();
+});
 
 // Serve static files (React build files)
 app.use(express.static(path.join(__dirname, 'build')));
@@ -69,7 +80,7 @@ app.post('/payment', async (req, res) => {
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app',
+    origin: process.env.FRONTEND_URL || 'https://cab-pygy.vercel.app', // Your frontend URL
     methods: ['GET', 'POST'],
   },
 });
