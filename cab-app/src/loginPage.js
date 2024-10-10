@@ -13,15 +13,13 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 
-function LoginPage({ curr, next, user, setUser, Email, photo, name, setName }) {
+function LoginPage({ curr, next, user, setUser, name, setName }) {
   const toast = useToast();
   
-  // State to store form values
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [sidebarVisible, setSidebarVisible] = useState(false);
-
-  // Quotes array
+  
   const quotes = [
     "The journey is just as important as the destination.",
     "Life is a journey, enjoy the ride.",
@@ -30,60 +28,57 @@ function LoginPage({ curr, next, user, setUser, Email, photo, name, setName }) {
     "The best way to predict the future is to create it."
   ];
   
-  // State to manage the current quote index
   const [currentQuote, setCurrentQuote] = useState(0);
 
-  // Handle form submit
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     
-    // POST request for login
-    fetch('https://dummyjson.com/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: email,
-        password: password,
-        expiresInMins: 30,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.token) {
-          toast({
-            title: 'Login successful.',
-            description: "You've successfully logged in.",
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          });
+    try {
+      const res = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: email, // Change 'username' to 'email' if required
+          password: password,
+          expiresInMins: 30,
+        }),
+      });
 
-          next(!curr);
-          setUser(data.image);
-          setName(data.firstName);
-        } else {
-          toast({
-            title: 'Login failed.',
-            description: data.message || 'Invalid credentials',
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
+      const data = await res.json();
+
+      if (res.ok) {
         toast({
-          title: 'An error occurred.',
-          description: 'Unable to log in. Please try again.',
+          title: 'Login successful.',
+          description: "You've successfully logged in.",
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+
+        next(!curr);
+        setUser(data.image); // Check if 'image' is the right property
+        setName(data.firstName); // Ensure 'firstName' exists in the response
+      } else {
+        toast({
+          title: 'Login failed.',
+          description: data.message || 'Invalid credentials',
           status: 'error',
           duration: 3000,
           isClosable: true,
         });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: 'An error occurred.',
+        description: 'Unable to log in. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
       });
+    }
   };
 
-  // Update quote every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentQuote((prevQuote) => (prevQuote + 1) % quotes.length);
@@ -92,7 +87,6 @@ function LoginPage({ curr, next, user, setUser, Email, photo, name, setName }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Create a keyframe for the animation
   const slideInBottom = keyframes`
     0% {
       opacity: 0;
@@ -115,7 +109,7 @@ function LoginPage({ curr, next, user, setUser, Email, photo, name, setName }) {
       alignItems="center"
       bg="black"
       p={4}
-      overflow="hidden" // Prevent overflow
+      overflow="hidden"
     >
       <Box
         w={{ base: "95%", md: "80%", lg: "70%" }}
@@ -185,7 +179,7 @@ function LoginPage({ curr, next, user, setUser, Email, photo, name, setName }) {
           borderRadius="3xl"
           boxShadow="0 0 15px rgba(128, 128, 128, 0.5)"
           transform="scale(1)"
-          overflowY="auto" // Allow vertical scrolling
+          overflowY="auto"
         >
           <VStack spacing={6}>
             <Heading as="h2" size="lg" color="#ffd100">
